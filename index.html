@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI综合实训平台 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        body.student {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body.teacher {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        
+        body.admin {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 460px;
+            max-width: 90%;
+            overflow: hidden;
+        }
+        
+        .role-tabs {
+            display: flex;
+            background: #f3f4f6;
+            padding: 4px;
+            margin: 16px;
+            border-radius: 12px;
+        }
+        
+        .role-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .role-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        body.student .role-tab.active { color: #667eea; }
+        body.teacher .role-tab.active { color: #2563eb; }
+        body.admin .role-tab.active { color: #7c3aed; }
+        
+        .login-header {
+            padding: 24px 32px;
+            text-align: center;
+            border-top: 1px solid #f3f4f6;
+        }
+        
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            transition: background 0.3s;
+        }
+        
+        body.student .logo { background: linear-gradient(135deg, #667eea, #764ba2); }
+        body.teacher .logo { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        body.admin .logo { background: linear-gradient(135deg, #7c3aed, #6366f1); }
+        
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .login-body {
+            padding: 0 32px 32px;
+        }
+        
+        .tab-switch {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+        
+        .tab-item.active {
+            background: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.student .tab-item.active { color: #667eea; }
+        body.teacher .tab-item.active { color: #2563eb; }
+        body.admin .tab-item.active { color: #7c3aed; }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group .form-input {
+            padding-right: 48px;
+        }
+        
+        .input-group .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+        
+        .input-group .toggle-password:hover {
+            color: #6b7280;
+        }
+        
+        .captcha-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .captcha-row .form-group {
+            flex: 1;
+        }
+        
+        .captcha-img {
+            width: 100px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #374151;
+        }
+        
+        body.student .form-input:focus { border-color: #667eea; }
+        body.teacher .form-input:focus { border-color: #2563eb; }
+        body.admin .form-input:focus { border-color: #7c3aed; }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        body.student .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); }
+        body.teacher .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        body.admin .btn-primary { background: linear-gradient(135deg, #7c3aed, #6366f1); }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+        }
+        
+        body.student .btn-primary:hover { box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
+        body.teacher .btn-primary:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        body.admin .btn-primary:hover { box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: 8px;
+            transition: color 0.2s;
+        }
+        
+        body.student .forgot-link { color: #667eea; }
+        body.teacher .forgot-link { color: #2563eb; }
+        body.admin .forgot-link { color: #7c3aed; }
+        
+        body.student .forgot-link:hover { color: #764ba2; }
+        body.teacher .forgot-link:hover { color: #1d4ed8; }
+        body.admin .forgot-link:hover { color: #6366f1; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-text { font-size: 12px; color: #9ca3af; }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .popup-overlay.show {
+            display: flex;
+        }
+        
+        .popup {
+            background: white;
+            border-radius: 12px;
+            width: 380px;
+            max-width: 90%;
+            overflow: hidden;
+        }
+        
+        .popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .popup-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .popup-close {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        
+        .popup-close:hover {
+            background: #f3f4f6;
+        }
+        
+        .popup-body {
+            padding: 20px;
+        }
+        
+        .popup-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        
+        .success-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .success-desc {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="student">
+    <div class="login-container">
+        <!-- 角色切换Tab -->
+        <div class="role-tabs">
+            <div class="role-tab active" onclick="switchRole('student')">
+                <span>👨‍🎓</span>
+                <span>学生端</span>
+            </div>
+            <div class="role-tab" onclick="switchRole('teacher')">
+                <span>👩‍🏫</span>
+                <span>教师端</span>
+            </div>
+            <div class="role-tab" onclick="switchRole('admin')">
+                <span>⚙️</span>
+                <span>管理端</span>
+            </div>
+        </div>
+        
+        <div class="login-header">
+            <div class="logo" id="logoIcon">🎓</div>
+            <div class="title">AI综合实训平台</div>
+            <div class="subtitle" id="roleSubtitle">学生端</div>
+        </div>
+        
+        <div class="login-body">
+            <div class="tab-switch">
+                <div class="tab-item active" onclick="switchTab('password')">账号密码登录</div>
+                <div class="tab-item" onclick="switchTab('sms')">验证码登录</div>
+            </div>
+            
+            <!-- 账号密码登录表单 -->
+            <div id="passwordForm">
+                <div class="form-group">
+                    <label class="form-label">手机号码</label>
+                    <input type="tel" class="form-input" id="phone" placeholder="请输入手机号">
+                    <div class="error-message" id="phoneError">请输入正确的手机号码</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <div class="input-group">
+                        <input type="password" class="form-input" id="password" placeholder="请输入密码">
+                        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+                    </div>
+                    <div class="error-message" id="passwordError">密码不能为空</div>
+                </div>
+                
+                <div class="captcha-row">
+                    <div class="form-group">
+                        <label class="form-label">验证码</label>
+                        <input type="text" class="form-input" id="captcha" placeholder="请输入验证码">
+                        <div class="error-message" id="captchaError">验证码不能为空</div>
+                    </div>
+                    <div class="captcha-img" id="captchaImg" onclick="refreshCaptcha()">AAAA</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="loginByPassword()">登 录</button>
+                
+                <a href="#" class="forgot-link" onclick="showResetPassword()">忘记密码？</a>
+            </div>
+            
+            <!-- 验证码登录表单 -->
+            <div id="smsForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">手机号码</label>
+                    <input type="tel" class="form-input" id="smsPhone" placeholder="请输入手机号">
+                    <div class="error-message" id="smsPhoneError">请输入正确的手机号码</div>
+                </div>
+                
+                <div class="captcha-row">
+                    <div class="form-group">
+                        <label class="form-label">图形验证码</label>
+                        <input type="text" class="form-input" id="smsCaptcha" placeholder="请输入验证码">
+                        <div class="error-message" id="smsCaptchaError">验证码不能为空</div>
+                    </div>
+                    <div class="captcha-img" id="smsCaptchaImg" onclick="refreshSmsCaptcha()">BBBB</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">短信验证码</label>
+                        <input type="text" class="form-input" id="smsCode" placeholder="请输入验证码">
+                        <div class="error-message" id="smsCodeError">验证码不能为空</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="visibility: hidden;">获取验证码</label>
+                        <button class="btn btn-outline btn-sm" id="getSmsBtn" onclick="sendSmsCode()">获取验证码</button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="loginBySms()">登 录</button>
+            </div>
+            
+            <div class="footer">
+                <p class="footer-text">© 2024 AI综合实训平台</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 忘记密码弹窗 -->
+    <div class="popup-overlay" id="resetPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <div class="popup-title">🔐 忘记密码</div>
+                <div class="popup-close" onclick="hidePopup('resetPopup')">✕</div>
+            </div>
+            <div class="popup-body" id="resetStep1">
+                <div style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">请输入您的手机号码，我们将发送验证码到您的手机</div>
+                <div class="form-group">
+                    <label class="form-label">手机号码</label>
+                    <input type="tel" class="form-input" id="resetPhone" placeholder="请输入手机号">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">验证码</label>
+                        <input type="text" class="form-input" id="resetCode" placeholder="请输入验证码">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="visibility: hidden;">获取验证码</label>
+                        <button class="btn btn-outline btn-sm" id="getResetBtn" onclick="sendResetCode()">获取验证码</button>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-body" id="resetStep2" style="display: none;">
+                <div style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">请设置新密码</div>
+                <div class="form-group">
+                    <label class="form-label">新密码</label>
+                    <input type="password" class="form-input" id="newPassword" placeholder="请输入新密码">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">确认密码</label>
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="请再次输入密码">
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn btn-outline btn-sm" onclick="hidePopup('resetPopup')">取消</button>
+                <button class="btn btn-primary btn-sm" id="resetNextBtn" onclick="resetNextStep()">下一步</button>
+                <button class="btn btn-primary btn-sm" id="resetSubmitBtn" style="display: none;" onclick="submitResetPassword()">确认重置</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 成功提示弹窗 -->
+    <div class="popup-overlay" id="successPopup">
+        <div class="popup">
+            <div class="success-message">
+                <div class="success-icon">✓</div>
+                <div class="success-text" id="successTitle">登录成功</div>
+                <div class="success-desc" id="successDesc">正在跳转...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var currentRole = 'student';
+        
+        function switchRole(role) {
+            currentRole = role;
+            
+            document.querySelectorAll('.role-tab').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.body.className = role;
+            
+            var icons = { student: '🎓', teacher: '👩‍🏫', admin: '⚙️' };
+            var subtitles = { student: '学生端', teacher: '教师端', admin: '管理员端' };
+            
+            document.getElementById('logoIcon').innerHTML = icons[role];
+            document.getElementById('roleSubtitle').innerHTML = subtitles[role];
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('passwordForm').style.display = tab === 'password' ? 'block' : 'none';
+            document.getElementById('smsForm').style.display = tab === 'sms' ? 'block' : 'none';
+        }
+        
+        function validatePhone(phone) {
+            const regex = /^1[3-9]\d{9}$/;
+            return regex.test(phone);
+        }
+        
+        function sendSmsCode() {
+            const phone = document.getElementById('smsPhone').value;
+            if (!validatePhone(phone)) {
+                document.getElementById('smsPhoneError').classList.add('show');
+                return;
+            }
+            document.getElementById('smsPhoneError').classList.remove('show');
+            
+            const btn = document.getElementById('getSmsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '发送中...';
+            
+            setTimeout(() => {
+                let count = 60;
+                btn.innerHTML = `${count}秒后重试`;
+                const timer = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.innerHTML = '获取验证码';
+                    } else {
+                        btn.innerHTML = `${count}秒后重试`;
+                    }
+                }, 1000);
+            }, 1000);
+            
+            alert('验证码已发送到您的手机');
+        }
+        
+        function loginByPassword() {
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const captcha = document.getElementById('captcha').value;
+            
+            if (!validatePhone(phone)) {
+                document.getElementById('phoneError').classList.add('show');
+                return;
+            }
+            document.getElementById('phoneError').classList.remove('show');
+            
+            if (!password) {
+                document.getElementById('passwordError').classList.add('show');
+                return;
+            }
+            document.getElementById('passwordError').classList.remove('show');
+            
+            if (!captcha) {
+                document.getElementById('captchaError').classList.add('show');
+                return;
+            }
+            document.getElementById('captchaError').classList.remove('show');
+            
+            performLogin();
+        }
+        
+        function loginBySms() {
+            const phone = document.getElementById('smsPhone').value;
+            const captcha = document.getElementById('smsCaptcha').value;
+            const code = document.getElementById('smsCode').value;
+            
+            if (!validatePhone(phone)) {
+                document.getElementById('smsPhoneError').classList.add('show');
+                return;
+            }
+            document.getElementById('smsPhoneError').classList.remove('show');
+            
+            if (!captcha) {
+                document.getElementById('smsCaptchaError').classList.add('show');
+                return;
+            }
+            document.getElementById('smsCaptchaError').classList.remove('show');
+            
+            if (!code) {
+                document.getElementById('smsCodeError').classList.add('show');
+                return;
+            }
+            document.getElementById('smsCodeError').classList.remove('show');
+            
+            performLogin();
+        }
+        
+        function performLogin() {
+            var redirectUrls = {
+                student: 'studentai.html',
+                teacher: 'teacherai.html',
+                admin: 'adminai.html'
+            };
+            
+            var successMessages = {
+                student: { title: '登录成功', desc: '正在跳转至学习首页...' },
+                teacher: { title: '登录成功', desc: '正在跳转至教师工作台...' },
+                admin: { title: '登录成功', desc: '正在跳转至管理后台...' }
+            };
+            
+            showSuccess(successMessages[currentRole].title, successMessages[currentRole].desc);
+            setTimeout(() => {
+                window.location.href = redirectUrls[currentRole];
+            }, 1500);
+        }
+        
+        function showResetPassword() {
+            document.getElementById('resetStep1').style.display = 'block';
+            document.getElementById('resetStep2').style.display = 'none';
+            document.getElementById('resetNextBtn').style.display = 'block';
+            document.getElementById('resetSubmitBtn').style.display = 'none';
+            document.getElementById('resetPopup').classList.add('show');
+        }
+        
+        function hidePopup(popupId) {
+            document.getElementById(popupId).classList.remove('show');
+        }
+        
+        function sendResetCode() {
+            const phone = document.getElementById('resetPhone').value;
+            if (!validatePhone(phone)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+            
+            const btn = document.getElementById('getResetBtn');
+            btn.disabled = true;
+            btn.innerHTML = '发送中...';
+            
+            setTimeout(() => {
+                let count = 60;
+                btn.innerHTML = `${count}秒后重试`;
+                const timer = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.innerHTML = '获取验证码';
+                    } else {
+                        btn.innerHTML = `${count}秒后重试`;
+                    }
+                }, 1000);
+            }, 1000);
+            
+            alert('验证码已发送到您的手机');
+        }
+        
+        function resetNextStep() {
+            const phone = document.getElementById('resetPhone').value;
+            const code = document.getElementById('resetCode').value;
+            
+            if (!validatePhone(phone) || !code) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            document.getElementById('resetStep1').style.display = 'none';
+            document.getElementById('resetStep2').style.display = 'block';
+            document.getElementById('resetNextBtn').style.display = 'none';
+            document.getElementById('resetSubmitBtn').style.display = 'block';
+        }
+        
+        function submitResetPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!newPassword || newPassword.length < 6) {
+                alert('密码长度至少6位');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+            
+            showSuccess('密码重置成功', '请使用新密码登录');
+            setTimeout(() => {
+                hidePopup('successPopup');
+                hidePopup('resetPopup');
+            }, 1500);
+        }
+        
+        function showSuccess(title, desc) {
+            document.getElementById('successTitle').innerHTML = title;
+            document.getElementById('successDesc').innerHTML = desc;
+            document.getElementById('successPopup').classList.add('show');
+        }
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '🙈';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '👁️';
+            }
+        }
+        
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        function refreshCaptcha() {
+            document.getElementById('captchaImg').innerHTML = generateCaptcha();
+            document.getElementById('captcha').value = '';
+        }
+        
+        function refreshSmsCaptcha() {
+            document.getElementById('smsCaptchaImg').innerHTML = generateCaptcha();
+            document.getElementById('smsCaptcha').value = '';
+        }
+    </script>
+</body>
+</html>
