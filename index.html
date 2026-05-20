@@ -295,9 +295,49 @@
         body.teacher .forgot-link:hover { color: #1d4ed8; }
         body.admin .forgot-link:hover { color: #6366f1; }
         
+        .quick-login {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .quick-login-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .quick-login-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .quick-btn {
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .quick-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
         .footer {
             text-align: center;
-            margin-top: 24px;
+            margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #e5e7eb;
         }
@@ -471,6 +511,29 @@
                 <button class="btn btn-primary" onclick="loginByPassword()">登 录</button>
                 
                 <a href="#" class="forgot-link" onclick="showResetPassword()">忘记密码？</a>
+                
+                <!-- 快捷登录 -->
+                <div class="quick-login">
+                    <div class="quick-login-title">🔑 快捷登录（原型预览）</div>
+                    <div class="quick-login-buttons">
+                        <button class="quick-btn" onclick="quickLogin('superadmin')">
+                            <span>👑</span>
+                            <span>超级管理员</span>
+                        </button>
+                        <button class="quick-btn" onclick="quickLogin('admin')">
+                            <span>🏛️</span>
+                            <span>学院管理员</span>
+                        </button>
+                        <button class="quick-btn" onclick="quickLogin('teacher')">
+                            <span>👩‍🏫</span>
+                            <span>教师</span>
+                        </button>
+                        <button class="quick-btn" onclick="quickLogin('student')">
+                            <span>👨‍🎓</span>
+                            <span>学生</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- 验证码登录表单 -->
@@ -676,6 +739,28 @@
             document.getElementById('smsCodeError').classList.remove('show');
             
             performLogin();
+        }
+        
+        // 快捷登录函数
+        function quickLogin(role) {
+            var redirectUrls = {
+                superadmin: 'superadmin.html#page-tenantList',
+                admin: 'adminai.html#page-termManage',
+                teacher: 'teacherai.html#page-classManage',
+                student: 'studentai.html#page-mycourses'
+            };
+            
+            var successMessages = {
+                superadmin: { title: '登录成功', desc: '正在跳转至租户管理...' },
+                admin: { title: '登录成功', desc: '正在跳转至学期管理...' },
+                teacher: { title: '登录成功', desc: '正在跳转至班级管理...' },
+                student: { title: '登录成功', desc: '正在跳转至我的课程...' }
+            };
+            
+            showSuccess(successMessages[role].title, successMessages[role].desc);
+            setTimeout(() => {
+                window.location.href = redirectUrls[role];
+            }, 1000);
         }
         
         function performLogin() {

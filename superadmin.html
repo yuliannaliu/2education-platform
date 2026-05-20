@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI实训平台 - 超级管理端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+            color: #fff;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+        }
+        
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+        }
+        
+        .nav-text {
+            font-size: 14px;
+        }
+        
+        .nav-submenu {
+            background: rgba(0,0,0,0.2);
+            padding-left: 20px;
+        }
+        
+        .nav-subitem {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            transition: color 0.2s;
+        }
+        
+        .nav-subitem:hover, .nav-subitem.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* 主内容区 */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .topbar {
+            background: #fff;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        /* 页面样式 */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .page-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        /* 按钮样式 */
+        .btn-sm {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-outline {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+        
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+        
+        .btn-danger {
+            background: #fff;
+            border: 1px solid #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #fef2f2;
+        }
+        
+        /* 表格样式 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        /* 弹窗样式 */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .popup-overlay.active {
+            display: flex;
+        }
+        
+        .popup {
+            background: #fff;
+            border-radius: 12px;
+            width: 480px;
+            max-width: 90%;
+            overflow: hidden;
+        }
+        
+        .popup-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .popup-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .popup-close {
+            cursor: pointer;
+            font-size: 18px;
+            color: #9ca3af;
+            line-height: 1;
+        }
+        
+        .popup-body {
+            padding: 20px;
+        }
+        
+        .popup-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: #667eea;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* 资源分配弹窗特殊样式 */
+        .resource-popup {
+            width: 800px;
+        }
+        
+        .resource-container {
+            display: flex;
+            gap: 20px;
+            height: 400px;
+        }
+        
+        .resource-left, .resource-right {
+            flex: 1;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .resource-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .resource-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .resource-item.selected {
+            background: #eef2ff;
+            border: 1px solid #667eea;
+        }
+        
+        .resource-item input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        .resource-item-name {
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        .course-count {
+            font-size: 12px;
+            color: #6b7280;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <span>⚙️</span>
+                    <span>超级管理端</span>
+                </div>
+            </div>
+            <div class="nav-item active" onclick="nav('tenantList')">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-text">租户管理</span>
+            </div>
+            <div class="nav-item" onclick="toggleResourceMenu()">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">资源管理</span>
+            </div>
+            <div class="nav-submenu" id="resourceMenu">
+                <div class="nav-subitem" onclick="nav('resourceCourse')">课程体系</div>
+                <div class="nav-subitem" onclick="nav('resourceTraining')">课程管理</div>
+                <div class="nav-subitem" onclick="nav('resourceCase')">实训管理</div>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main">
+            <div class="topbar">
+                <div class="topbar-title" id="topBread">租户管理</div>
+                <div class="user-info">
+                    <div class="user-avatar">超</div>
+                    <div>
+                        <div style="font-size: 13px; color: #374151;">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- 租户列表页 -->
+                <div class="page active" id="page-tenantList">
+                    <div class="page-header">
+                        <div class="page-title">🏢 租户管理</div>
+                        <div class="page-subtitle">管理平台租户（学校）信息，分配课程资源</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">租户列表</div>
+                            <button class="btn-sm btn-primary" onclick="showPopup('tenantPopup')">➕ 新增租户</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">序号</th>
+                                    <th>租户（学校）名称</th>
+                                    <th style="width: 120px;">备注</th>
+                                    <th style="width: 180px;">已分配课程体系</th>
+                                    <th style="width: 140px;">创建时间</th>
+                                    <th style="width: 180px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>北京大学</td>
+                                    <td>双一流高校</td>
+                                    <td>
+                                        <div>AI智能体</div>
+                                        <div>AI基础</div>
+                                    </td>
+                                    <td>2024-01-15 14:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" onclick="editTenant(1)" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-danger" onclick="deleteTenant(1)" style="margin-right: 4px; padding: 4px 10px;">删除</button>
+                                        <button class="btn-sm btn-primary" onclick="showResourcePopup(1)" style="padding: 4px 10px;">分配资源</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>清华大学</td>
+                                    <td>双一流高校</td>
+                                    <td>
+                                        <div>AI智能体</div>
+                                        <div>AI提示词</div>
+                                    </td>
+                                    <td>2024-01-14 09:15</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" onclick="editTenant(2)" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-danger" onclick="deleteTenant(2)" style="margin-right: 4px; padding: 4px 10px;">删除</button>
+                                        <button class="btn-sm btn-primary" onclick="showResourcePopup(2)" style="padding: 4px 10px;">分配资源</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>浙江大学</td>
+                                    <td>双一流高校</td>
+                                    <td>
+                                        <div>AI+商科</div>
+                                    </td>
+                                    <td>2024-01-13 16:45</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" onclick="editTenant(3)" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-danger" onclick="deleteTenant(3)" style="margin-right: 4px; padding: 4px 10px;">删除</button>
+                                        <button class="btn-sm btn-primary" onclick="showResourcePopup(3)" style="padding: 4px 10px;">分配资源</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>复旦大学</td>
+                                    <td>双一流高校</td>
+                                    <td>
+                                        <div>AI智能体</div>
+                                        <div>AI基础</div>
+                                        <div>AI提示词</div>
+                                    </td>
+                                    <td>2024-01-12 11:20</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" onclick="editTenant(4)" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-danger" onclick="deleteTenant(4)" style="margin-right: 4px; padding: 4px 10px;">删除</button>
+                                        <button class="btn-sm btn-primary" onclick="showResourcePopup(4)" style="padding: 4px 10px;">分配资源</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 课程体系管理页 -->
+                <div class="page" id="page-resourceCourse">
+                    <div class="page-header">
+                        <div class="page-title">📚 课程体系管理</div>
+                        <div class="page-subtitle">管理平台课程资源，维护课程体系结构</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">课程体系列表</div>
+                            <button class="btn-sm btn-primary" onclick="showPopup('courseSystemPopup')">➕ 新建</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">序号</th>
+                                    <th style="width: 150px;">课程体系名称</th>
+                                    <th>课程名称</th>
+                                    <th style="width: 140px;">更新时间</th>
+                                    <th style="width: 100px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>AI智能体</td>
+                                    <td>
+                                        <div>DeepSeek 构建智能对话系统</div>
+                                        <div>智能体工作流设计基础</div>
+                                        <div>构建智能体工作案例实战</div>
+                                    </td>
+                                    <td>2024-01-15 14:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;" onclick="showPopup('editCourseSystemPopup')">编辑</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed;" title="该课程体系不可删除，已经关联相关课程">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>AI+商科</td>
+                                    <td>
+                                        <div>AI营销策划实战</div>
+                                        <div>AI财务数据分析</div>
+                                    </td>
+                                    <td>2024-01-14 09:15</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;" onclick="showPopup('editCourseSystemPopup')">编辑</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed;" title="该课程体系不可删除，已经关联相关课程">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>AI基础</td>
+                                    <td>
+                                        <div>人工智能导论</div>
+                                        <div>机器学习基础</div>
+                                        <div>深度学习入门</div>
+                                        <div>Python编程</div>
+                                        <div>数据科学导论</div>
+                                    </td>
+                                    <td>2024-01-13 16:45</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;" onclick="showPopup('editCourseSystemPopup')">编辑</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed;" title="该课程体系不可删除，已经关联相关课程">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>AI提示词</td>
+                                    <td>
+                                        <div>提示词工程基础</div>
+                                        <div>提示词技巧</div>
+                                        <div>高级提示词技巧</div>
+                                        <div>提示词优化实战</div>
+                                        <div>多模态提示词</div>
+                                    </td>
+                                    <td>2024-01-12 11:20</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;" onclick="showPopup('editCourseSystemPopup')">编辑</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed;" title="该课程体系不可删除，已经关联相关课程">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="padding: 16px; text-align: right; border-top: 1px solid #e5e7eb;">
+                            <span style="font-size: 13px; color: #6b7280;">共 4 条记录</span>
+                            <div style="display: inline-flex; gap: 8px; margin-left: 20px;">
+                                <button class="btn-sm btn-outline" disabled>上一页</button>
+                                <button class="btn-sm btn-primary">1</button>
+                                <button class="btn-sm btn-outline">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 课程管理页 -->
+                <div class="page" id="page-resourceTraining">
+                    <div class="page-header">
+                        <div class="page-title">📖 课程管理</div>
+                        <div class="page-subtitle">管理平台课程信息，维护课程基本数据</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">课程列表</div>
+                            <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);" onclick="showPopup('courseCreatePopup')">📚 新建</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">序号</th>
+                                    <th>课程名称</th>
+                                    <th style="width: 100px;">体系名称</th>
+                                    <th style="width: 70px;">总课时</th>
+                                    <th style="width: 70px;">理论课时</th>
+                                    <th style="width: 70px;">实训课时</th>
+                                    <th style="width: 140px;">更新时间</th>
+                                    <th style="width: 100px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td><a href="#" style="color: #667eea;">DeepSeek 构建智能对话系统</a></td>
+                                    <td><span style="background: #eef2ff; color: #667eea; padding: 2px 8px; border-radius: 4px; font-size: 12px;">AI智能体</span></td>
+                                    <td>16</td>
+                                    <td>8</td>
+                                    <td>8</td>
+                                    <td>2024-01-15 14:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;">编辑</button>
+                                        <button class="btn-sm btn-danger">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td><a href="#" style="color: #667eea;">智能体工作流设计基础</a></td>
+                                    <td><span style="background: #eef2ff; color: #667eea; padding: 2px 8px; border-radius: 4px; font-size: 12px;">AI智能体</span></td>
+                                    <td>24</td>
+                                    <td>12</td>
+                                    <td>12</td>
+                                    <td>2024-01-14 09:15</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;">编辑</button>
+                                        <button class="btn-sm btn-danger">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td><a href="#" style="color: #667eea;">构建智能体工作案例实战</a></td>
+                                    <td><span style="background: #eef2ff; color: #667eea; padding: 2px 8px; border-radius: 4px; font-size: 12px;">AI智能体</span></td>
+                                    <td>24</td>
+                                    <td>8</td>
+                                    <td>16</td>
+                                    <td>2024-01-13 16:45</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px;">编辑</button>
+                                        <button class="btn-sm btn-danger">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="padding: 16px; text-align: right; border-top: 1px solid #e5e7eb;">
+                            <span style="font-size: 13px; color: #6b7280;">共 3 条记录</span>
+                            <div style="display: inline-flex; gap: 8px; margin-left: 20px;">
+                                <button class="btn-sm btn-outline" disabled>上一页</button>
+                                <button class="btn-sm btn-primary">1</button>
+                                <button class="btn-sm btn-outline">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 实训管理页 -->
+                <div class="page" id="page-resourceCase">
+                    <div class="page-header">
+                        <div class="page-title">⚗️ 实训管理</div>
+                        <div class="page-subtitle">管理平台实训项目，维护实验内容</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">实训列表</div>
+                            <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);" onclick="showPopup('trainingCreatePopup')">➕ 新建实训</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">序号</th>
+                                    <th>实训名称</th>
+                                    <th style="width: 160px;">归属课程</th>
+                                    <th style="width: 60px;">课时</th>
+                                    <th style="width: 140px;">更新时间</th>
+                                    <th style="width: 180px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td><a href="#" style="color: #667eea;">实验1 - 智能体提示词基础</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-15 14:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td><a href="#" style="color: #667eea;">实验2 - 智能体提示语设计原则</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-15 15:20</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td><a href="#" style="color: #667eea;">实验3 - 智能体提示语实践指南</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-14 09:15</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td><a href="#" style="color: #667eea;">实验4 - 文案写作智能体</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>4课时</td>
+                                    <td>2024-01-14 11:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed; padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td><a href="#" style="color: #667eea;">实验5 - 商业计划智能体</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-13 16:45</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td><a href="#" style="color: #667eea;">实验6 - 情感咨询智能体</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-13 14:20</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-outline" style="color: #9ca3af; cursor: not-allowed; padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td><a href="#" style="color: #667eea;">实验7 - 模拟面试智能体</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>2课时</td>
+                                    <td>2024-01-12 10:00</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td><a href="#" style="color: #667eea;">实验8 - 多轮对话智能体</a></td>
+                                    <td>智能体工作流设计基础</td>
+                                    <td>4课时</td>
+                                    <td>2024-01-12 11:30</td>
+                                    <td style="white-space: nowrap;">
+                                        <button class="btn-sm btn-outline" style="margin-right: 4px; padding: 4px 10px;">编辑</button>
+                                        <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); margin-right: 4px; padding: 4px 10px;">一键上机</button>
+                                        <button class="btn-sm btn-danger" style="padding: 4px 10px;">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="padding: 16px; text-align: right; border-top: 1px solid #e5e7eb;">
+                            <span style="font-size: 13px; color: #6b7280;">共 8 条记录</span>
+                            <div style="display: inline-flex; gap: 8px; margin-left: 20px;">
+                                <button class="btn-sm btn-outline" disabled>上一页</button>
+                                <button class="btn-sm btn-primary">1</button>
+                                <button class="btn-sm btn-outline">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 弹窗区域 -->
+    <div class="popup-overlay" id="tenantPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <div class="popup-title">新增租户</div>
+                <div class="popup-close" onclick="hidePopup('tenantPopup')">✕</div>
+            </div>
+            <div class="popup-body">
+                <div class="form-group">
+                    <label class="form-label">租户（学校）名称</label>
+                    <input type="text" class="form-input" id="tenantName" placeholder="请输入学校名称">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-textarea" id="tenantRemark" placeholder="请输入备注信息（可选）"></textarea>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('tenantPopup')">取消</button>
+                <button class="btn-sm btn-primary" onclick="createTenant()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑租户弹窗 -->
+    <div class="popup-overlay" id="editTenantPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <div class="popup-title">编辑租户</div>
+                <div class="popup-close" onclick="hidePopup('editTenantPopup')">✕</div>
+            </div>
+            <div class="popup-body">
+                <div class="form-group">
+                    <label class="form-label">租户（学校）名称</label>
+                    <input type="text" class="form-input" id="editTenantName" value="北京大学">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-textarea" id="editTenantRemark">双一流高校</textarea>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('editTenantPopup')">取消</button>
+                <button class="btn-sm btn-primary" onclick="saveTenant()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新建课程体系弹窗 -->
+    <div class="popup-overlay" id="courseSystemPopup">
+        <div class="popup" style="width: 600px;">
+            <div class="popup-header" style="background: linear-gradient(135deg, #667eea 0%, #7c3aed 100%); color: #fff;">
+                <div class="popup-title" style="color: #fff;">📋 新建课程体系</div>
+                <div class="popup-close" onclick="hidePopup('courseSystemPopup')" style="color: #fff;">✕</div>
+            </div>
+            <div class="popup-body" style="padding: 24px;">
+                <p style="color: #6b7280; font-size: 13px; margin-bottom: 20px;">请填写课程体系信息</p>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">课程体系名称 <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="form-input" placeholder="（示例）AI+智能体">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">课程列表 <span style="color: #ef4444;">*</span></label>
+                    <select class="form-input" multiple style="min-height: 150px; margin-top: 8px;">
+                        <option value="1">DeepSeek 构建智能对话系统</option>
+                        <option value="2" selected>智能体工作流设计基础</option>
+                        <option value="3" selected>构建智能体工作案例实战</option>
+                        <option value="4">AI营销策划实战</option>
+                        <option value="5">AI财务数据分析</option>
+                        <option value="6">人工智能导论</option>
+                        <option value="7">机器学习基础</option>
+                        <option value="8">深度学习入门</option>
+                        <option value="9">Python编程</option>
+                        <option value="10">数据科学导论</option>
+                        <option value="11">提示词工程基础</option>
+                        <option value="12">提示词技巧</option>
+                        <option value="13">高级提示词技巧</option>
+                        <option value="14">提示词优化实战</option>
+                        <option value="15">多模态提示词</option>
+                    </select>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 6px;">按住 Ctrl 键可多选</p>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('courseSystemPopup')">取消</button>
+                <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑课程体系弹窗 -->
+    <div class="popup-overlay" id="editCourseSystemPopup">
+        <div class="popup" style="width: 600px;">
+            <div class="popup-header" style="background: linear-gradient(135deg, #667eea 0%, #7c3aed 100%); color: #fff;">
+                <div class="popup-title" style="color: #fff;">📋 编辑课程体系</div>
+                <div class="popup-close" onclick="hidePopup('editCourseSystemPopup')" style="color: #fff;">✕</div>
+            </div>
+            <div class="popup-body" style="padding: 24px;">
+                <p style="color: #6b7280; font-size: 13px; margin-bottom: 20px;">请修改课程体系信息</p>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">课程体系名称 <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="form-input" value="AI智能体">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">课程列表 <span style="color: #ef4444;">*</span></label>
+                    <select class="form-input" multiple style="min-height: 150px; margin-top: 8px;">
+                        <option value="1" selected>DeepSeek 构建智能对话系统</option>
+                        <option value="2" selected>智能体工作流设计基础</option>
+                        <option value="3" selected>构建智能体工作案例实战</option>
+                        <option value="4">AI营销策划实战</option>
+                        <option value="5">AI财务数据分析</option>
+                        <option value="6">人工智能导论</option>
+                        <option value="7">机器学习基础</option>
+                        <option value="8">深度学习入门</option>
+                        <option value="9">Python编程</option>
+                        <option value="10">数据科学导论</option>
+                        <option value="11">提示词工程基础</option>
+                        <option value="12">提示词技巧</option>
+                        <option value="13">高级提示词技巧</option>
+                        <option value="14">提示词优化实战</option>
+                        <option value="15">多模态提示词</option>
+                    </select>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 6px;">按住 Ctrl 键可多选</p>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('editCourseSystemPopup')">取消</button>
+                <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新建弹窗 -->
+    <div class="popup-overlay" id="courseCreatePopup">
+        <div class="popup" style="width: 700px;">
+            <div class="popup-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); color: #fff;">
+                <div class="popup-title" style="color: #fff;">📚 新建课程</div>
+                <div class="popup-close" onclick="hidePopup('courseCreatePopup')" style="color: #fff;">✕</div>
+            </div>
+            <div class="popup-body" style="padding: 0;">
+                <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                        
+                        <span style="font-size: 16px; font-weight: 600;">新建课程</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px;">
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-weight: 600;">课程名称 <span style="color: #ef4444;">*</span></label>
+                            <input type="text" class="form-input" placeholder="请输入课程名称">
+                        </div>
+                        <div style="width: 150px;">
+                            <label class="form-label" style="font-weight: 600;">总课时</label>
+                            <input type="text" class="form-input" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">所属课程体系 <span style="color: #ef4444;">*</span></label>
+                        <select class="form-input">
+                            <option>请选择课程体系</option>
+                            <option>AI智能体</option>
+                            <option>AI+商科</option>
+                            <option>AI基础</option>
+                            <option>AI提示词</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">课程介绍</label>
+                        <textarea class="form-textarea" placeholder="请输入课程介绍..."></textarea>
+                    </div>
+                </div>
+                
+                <div style="padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span style="font-weight: 600;">📋 章节目录</span>
+                        <button class="btn-sm btn-primary">➕ 添加章节</button>
+                    </div>
+                    
+                    <div style="background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <input type="text" class="form-input" style="flex: 1;" value="第一章：智能体基础概述">
+                            <button class="btn-sm btn-outline">删除</button>
+                        </div>
+                        
+                        <div style="margin-left: 16px;">
+                            <div style="color: #6b7280; font-size: 13px; margin-bottom: 8px;">课程列表</div>
+                            <button class="btn-sm btn-outline" style="margin-bottom: 12px;">➕ 添加课程</button>
+                            
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <input type="text" class="form-input" style="flex: 1;" value="1.1 智能体概念与发展">
+                                <input type="text" class="form-input" style="width: 60px;" value="2">
+                                <select class="form-input" style="width: 120px;">
+                                    <option>📚 理论课</option>
+                                    <option>⚗️ 实训课</option>
+                                </select>
+                                <button class="btn-sm btn-outline">删除</button>
+                            </div>
+                            
+                            <div style="background: #fff; border: 1px dashed #d1d5db; border-radius: 8px; padding: 16px; text-align: center; color: #9ca3af; margin-bottom: 8px;">
+                                上传资料</div>
+                            
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <input type="text" class="form-input" style="flex: 1;" value="1.2 智能体工作原理">
+                                <input type="text" class="form-input" style="width: 60px;" value="2">
+                                <select class="form-input" style="width: 120px;">
+                                    <option>📚 理论课</option>
+                                    <option>⚗️ 实训课</option>
+                                </select>
+                                <button class="btn-sm btn-primary" style="background: #10b981;">选择实训</button>
+                                <button class="btn-sm btn-outline">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f9fafb; border-radius: 8px; padding: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <input type="text" class="form-input" style="flex: 1;" value="第二章：智能体工作流设计">
+                            <button class="btn-sm btn-outline">删除</button>
+                        </div>
+                        
+                        <div style="margin-left: 16px;">
+                            <div style="color: #6b7280; font-size: 13px; margin-bottom: 8px;">课程列表</div>
+                            <button class="btn-sm btn-outline" style="margin-bottom: 12px;">➕ 添加课程</button>
+                            
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <input type="text" class="form-input" style="flex: 1;" value="2.1 工作流概念与设计原则">
+                                <input type="text" class="form-input" style="width: 60px;" value="2">
+                                <select class="form-input" style="width: 120px;">
+                                    <option>📚 理论课</option>
+                                    <option>⚗️ 实训课</option>
+                                </select>
+                                <button class="btn-sm btn-outline">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('courseCreatePopup')">取消</button>
+                <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新建实训弹窗 -->
+    <div class="popup-overlay" id="trainingCreatePopup">
+        <div class="popup" style="width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="popup-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); color: #fff;">
+                <div class="popup-title" style="color: #fff;">⚗️ 新建实训</div>
+                <div class="popup-close" onclick="hidePopup('trainingCreatePopup')" style="color: #fff;">✕</div>
+            </div>
+            <div class="popup-body" style="padding: 24px;">
+                <!-- 基础信息 -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;">基础信息</h3>
+                    
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-weight: 600;">实训名称 <span style="color: #ef4444;">*</span></label>
+                            <input type="text" class="form-input" placeholder="请输入实训名称，最多50字">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-weight: 600;">实训难度 <span style="color: #ef4444;">*</span></label>
+                            <div style="display: flex; gap: 24px;">
+                                <label style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="radio" name="difficulty" value="初级" checked>
+                                    <span>初级</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="radio" name="difficulty" value="中级">
+                                    <span>中级</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="radio" name="difficulty" value="高级">
+                                    <span>高级</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div style="width: 120px;">
+                            <label class="form-label" style="font-weight: 600;">学时 <span style="color: #ef4444;">*</span></label>
+                            <input type="text" class="form-input" value="2">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">实训描述</label>
+                        <textarea class="form-textarea" placeholder="请描述实训目标，最多200字"></textarea>
+                    </div>
+                </div>
+                
+                <!-- 实训环境配置 -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;">实训环境配置</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">实验类型 <span style="color: #ef4444;">*</span></label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="expType" value="虚拟桌面">
+                                <span>虚拟桌面</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="expType" value="Jupyter">
+                                <span>Jupyter实验</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="expType" value="AI智能体" checked>
+                                <span>AI智能体编辑器</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="expType" value="VSCode">
+                                <span>VSCode编辑器</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="expType" value="数智建模">
+                                <span>数智建模实验</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 实验指导书 -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;">📝 实验指导书 <span style="color: #ef4444;">*</span></h3>
+                    
+                    <div style="background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fff; border-bottom: 1px solid #e5e7eb;">
+                            <select class="form-input" style="width: 120px; padding: 6px 10px;">
+                                <option>Arial</option>
+                                <option>宋体</option>
+                                <option>微软雅黑</option>
+                            </select>
+                            <select class="form-input" style="width: 100px; padding: 6px 10px;">
+                                <option>14px</option>
+                                <option>16px</option>
+                                <option>18px</option>
+                            </select>
+                            <select class="form-input" style="width: 100px; padding: 6px 10px;">
+                                <option>段落</option>
+                                <option>标题1</option>
+                                <option>标题2</option>
+                            </select>
+                            <div style="flex: 1;"></div>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px; font-weight: 600;">B</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px; font-style: italic;">I</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px; text-decoration: underline;">U</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">●</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">◀</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">▶</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">⟷</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">⟹</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">⟸</button>
+                            <button class="btn-sm btn-outline" style="padding: 4px 10px;">🖼️ 图片</button>
+                        </div>
+                        <textarea class="form-textarea" style="height: 200px; border: none; background: transparent;" placeholder="点击此处开始编辑实验指导书..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- 报告模板 -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">报告模板</h3>
+                    <div style="background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 8px; padding: 24px; text-align: center;">
+                        <div style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">上传报告模板文件</div>
+                        <button class="btn-sm btn-primary" style="background: #fff; color: #667eea; border: 1px solid #667eea;">上传文件</button>
+                    </div>
+                </div>
+                
+                <!-- 数据集 -->
+                <div>
+                    <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">数据集</h3>
+                    <div style="background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 8px; padding: 24px; text-align: center;">
+                        <div style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">上传数据集文件</div>
+                        <button class="btn-sm btn-primary" style="background: #fff; color: #667eea; border: 1px solid #667eea;">上传文件</button>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('trainingCreatePopup')">取消</button>
+                <button class="btn-sm btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 资源分配弹窗 -->
+    <div class="popup-overlay" id="resourcePopup">
+        <div class="popup resource-popup">
+            <div class="popup-header">
+                <div class="popup-title">分配课程资源</div>
+                <div class="popup-close" onclick="hidePopup('resourcePopup')">✕</div>
+            </div>
+            <div class="popup-body">
+                <div class="resource-container">
+                    <div class="resource-left">
+                        <div class="resource-title">📚 课程体系</div>
+                        <div class="resource-item selected" onclick="toggleCourseSystem(1)">
+                            <input type="checkbox" checked>
+                            <span class="resource-item-name">AI智能体开发系列</span>
+                            <span class="course-count">8门课程</span>
+                        </div>
+                        <div class="resource-item" onclick="toggleCourseSystem(2)">
+                            <input type="checkbox">
+                            <span class="resource-item-name">深度学习实战系列</span>
+                            <span class="course-count">6门课程</span>
+                        </div>
+                        <div class="resource-item" onclick="toggleCourseSystem(3)">
+                            <input type="checkbox">
+                            <span class="resource-item-name">数据分析系列</span>
+                            <span class="course-count">4门课程</span>
+                        </div>
+                    </div>
+                    <div class="resource-right">
+                        <div class="resource-title">📖 课程列表</div>
+                        <div class="resource-item selected">
+                            <input type="checkbox" checked>
+                            <span class="resource-item-name">智能体提示词基础</span>
+                        </div>
+                        <div class="resource-item selected">
+                            <input type="checkbox" checked>
+                            <span class="resource-item-name">智能体工作流设计</span>
+                        </div>
+                        <div class="resource-item selected">
+                            <input type="checkbox" checked>
+                            <span class="resource-item-name">智能体对话系统开发</span>
+                        </div>
+                        <div class="resource-item">
+                            <input type="checkbox">
+                            <span class="resource-item-name">智能体记忆管理</span>
+                        </div>
+                        <div class="resource-item">
+                            <input type="checkbox">
+                            <span class="resource-item-name">智能体工具调用</span>
+                        </div>
+                        <div class="resource-item">
+                            <input type="checkbox">
+                            <span class="resource-item-name">智能体评估与优化</span>
+                        </div>
+                        <div class="resource-item">
+                            <input type="checkbox">
+                            <span class="resource-item-name">智能体部署与运维</span>
+                        </div>
+                        <div class="resource-item">
+                            <input type="checkbox">
+                            <span class="resource-item-name">智能体安全与隐私</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-sm btn-outline" onclick="hidePopup('resourcePopup')">取消</button>
+                <button class="btn-sm btn-primary" onclick="saveResourceAllocation()">确认分配</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 导航函数
+        function nav(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            // 显示目标页面
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // 更新面包屑
+            const pageNames = {
+                'tenantList': '租户管理',
+                'resourceCourse': '课程体系',
+                'resourceTraining': '课程管理',
+                'resourceCase': '实训管理'
+            };
+            document.getElementById('topBread').textContent = pageNames[pageId] || pageId;
+            
+            // 更新导航激活状态
+            document.querySelectorAll('.nav-item, .nav-subitem').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // 切换资源管理菜单
+        function toggleResourceMenu() {
+            const menu = document.getElementById('resourceMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        // 弹窗操作
+        function showPopup(popupId) {
+            document.getElementById(popupId).classList.add('active');
+        }
+        
+        function hidePopup(popupId) {
+            document.getElementById(popupId).classList.remove('active');
+        }
+        
+        // 租户管理函数
+        function editTenant(tenantId) {
+            showPopup('editTenantPopup');
+            console.log('编辑租户 ID:', tenantId);
+        }
+        
+        function deleteTenant(tenantId) {
+            if (confirm('确定要删除该租户吗？')) {
+                alert('租户删除成功！');
+            }
+        }
+        
+        function showResourcePopup(tenantId) {
+            showPopup('resourcePopup');
+            console.log('为租户 ID:', tenantId, '分配资源');
+        }
+        
+        function createTenant() {
+            const name = document.getElementById('tenantName').value;
+            if (!name.trim()) {
+                alert('请输入租户名称！');
+                return;
+            }
+            alert('租户创建成功！');
+            hidePopup('tenantPopup');
+            document.getElementById('tenantName').value = '';
+            document.getElementById('tenantRemark').value = '';
+        }
+        
+        function saveTenant() {
+            alert('租户信息保存成功！');
+            hidePopup('editTenantPopup');
+        }
+        
+        // 课程体系选择
+        function toggleCourseSystem(systemId) {
+            const item = event.currentTarget;
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            item.classList.toggle('selected', checkbox.checked);
+        }
+        
+        // 保存资源分配
+        function saveResourceAllocation() {
+            alert('资源分配成功！');
+            hidePopup('resourcePopup');
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化资源菜单隐藏
+            document.getElementById('resourceMenu').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
